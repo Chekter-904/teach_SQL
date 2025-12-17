@@ -1,21 +1,15 @@
 # ==========================================
 # Импорт библиотек
 # ==========================================
-
-import tkinter as tk      # библиотека для создания графического интерфейса
-import sqlite3            # библиотека для работы с SQLite
-
+import tkinter as tk
+import sqlite3
+from tkinter import messagebox
 
 # ==========================================
 # Подключение к базе данных
 # ==========================================
-
 def connect_db():
-    """
-    Подключаемся к базе данных.
-    Файл базы данных должен лежать рядом с этим файлом.
-    """
-    return sqlite3.connect("database.db")
+    return sqlite3.connect("northwind.db")
 
 
 # ==========================================
@@ -23,17 +17,24 @@ def connect_db():
 # ==========================================
 
 def run_select(query):
-    """
-    Выполняет SELECT-запрос и возвращает результат
-    """
-    conn = connect_db()        # подключаемся к БД
-    cursor = conn.cursor()     # создаём курсор
+    try:
+        conn = connect_db()
+        cursor = conn.cursor()
+        cursor.execute(query)
+        result = cursor.fetchall()
+        conn.close()
+        return result
+    except Exception as e:
+        messagebox.showerror("SQL ошибка", str(e))
+        return []
 
-    cursor.execute(query)     # выполняем SQL-запрос
-    result = cursor.fetchall()# получаем результат
 
-    conn.close()               # закрываем соединение
-    return result
+def show_result(result):
+    output.delete(1.0, tk.END)
+    if not result:
+        output.insert(tk.END, "Нет данных\n")
+    for row in result:
+        output.insert(tk.END, str(row) + "\n")
 
 
 # ==========================================
@@ -41,110 +42,44 @@ def run_select(query):
 # ==========================================
 
 def select_1():
-    """
-    SELECT-запрос №1
-    """
-    output.delete(1.0, tk.END)  # очищаем поле вывода
-
-    # ❗ СТУДЕНТ ПИШЕТ ЗАПРОС ЗДЕСЬ
-    query = "SELECT * FROM students;"
-
-    result = run_select(query)
-
-    for row in result:
-        output.insert(tk.END, str(row) + "\n")
+    query = "SELECT CustomerID, CompanyName, Country FROM Customers;"
+    show_result(run_select(query))
 
 
 def select_2():
-    """
-    SELECT-запрос №2
-    """
-    output.delete(1.0, tk.END)
-
-    # ❗ СТУДЕНТ ПИШЕТ ЗАПРОС ЗДЕСЬ
-    query = "SELECT name, age FROM students;"
-
-    result = run_select(query)
-
-    for row in result:
-        output.insert(tk.END, str(row) + "\n")
+    query = "SELECT OrderID, OrderDate, ShipCountry FROM Orders LIMIT 20;"
+    show_result(run_select(query))
 
 
 def select_3():
-    """
-    SELECT-запрос №3
-    """
-    output.delete(1.0, tk.END)
-
-    # ❗ СТУДЕНТ ПИШЕТ ЗАПРОС ЗДЕСЬ
-    query = "SELECT * FROM students WHERE age > 18;"
-
-    result = run_select(query)
-
-    for row in result:
-        output.insert(tk.END, str(row) + "\n")
+    query = "SELECT ProductName, UnitPrice FROM Products WHERE UnitPrice > 50;"
+    show_result(run_select(query))
 
 
 def select_4():
-    """
-    SELECT-запрос №4
-    """
-    output.delete(1.0, tk.END)
-
-    # ❗ СТУДЕНТ ПИШЕТ ЗАПРОС ЗДЕСЬ
-    query = "SELECT DISTINCT group_name FROM students;"
-
-    result = run_select(query)
-
-    for row in result:
-        output.insert(tk.END, str(row) + "\n")
+    query = "SELECT DISTINCT Country FROM Customers;"
+    show_result(run_select(query))
 
 
 def select_5():
-    """
-    SELECT-запрос №5
-    """
-    output.delete(1.0, tk.END)
-
-    # ❗ СТУДЕНТ ПИШЕТ ЗАПРОС ЗДЕСЬ
-    query = "SELECT COUNT(*) FROM students;"
-
-    result = run_select(query)
-
-    for row in result:
-        output.insert(tk.END, str(row) + "\n")
+    query = "SELECT COUNT(*) FROM Orders;"
+    show_result(run_select(query))
 
 
-# ==========================================
-# Создание окна
-# ==========================================
+# ---------- ОКНО ----------
 
 window = tk.Tk()
-window.title("SELECT-запросы к базе данных")
-window.geometry("600x400")
+window.title("SQL кнопки (Northwind)")
+window.geometry("700x450")
 
+tk.Button(window, text="Все клиенты", command=select_1).pack(pady=3)
+tk.Button(window, text="Заказы (20)", command=select_2).pack(pady=3)
+tk.Button(window, text="Дорогие товары", command=select_3).pack(pady=3)
+tk.Button(window, text="Страны клиентов", command=select_4).pack(pady=3)
+tk.Button(window, text="Кол-во заказов", command=select_5).pack(pady=3)
 
-# ==========================================
-# Кнопки
-# ==========================================
-
-tk.Button(window, text="SELECT 1", command=select_1).pack(pady=3)
-tk.Button(window, text="SELECT 2", command=select_2).pack(pady=3)
-tk.Button(window, text="SELECT 3", command=select_3).pack(pady=3)
-tk.Button(window, text="SELECT 4", command=select_4).pack(pady=3)
-tk.Button(window, text="SELECT 5", command=select_5).pack(pady=3)
-
-
-# ==========================================
-# Поле вывода результата
-# ==========================================
-
-output = tk.Text(window, height=12, width=70)
+output = tk.Text(window, height=15, width=85)
 output.pack(pady=10)
 
-
-# ==========================================
-# Запуск программы
-# ==========================================
-
 window.mainloop()
+
