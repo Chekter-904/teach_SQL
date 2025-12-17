@@ -42,27 +42,27 @@ def show_result(result):
 # ==========================================
 
 def select_1():
-    query = "SELECT CustomerID, CompanyName, Country FROM Customers;"
+    query = "SELECT CustomerID, CompanyName FROM Customers;"
     show_result(run_select(query))
-
 
 def select_2():
-    query = "SELECT OrderID, OrderDate, ShipCountry FROM Orders LIMIT 20;"
-    show_result(run_select(query))
-
-
-def select_3():
-    query = "SELECT ProductName, UnitPrice FROM Products WHERE UnitPrice > 50;"
-    show_result(run_select(query))
-
-
-def select_4():
     query = "SELECT DISTINCT Country FROM Customers;"
     show_result(run_select(query))
 
 
+def select_3():
+    query = "SELECT ProductName, UnitPrice FROM Products ORDER BY UnitPrice DESC;"
+    show_result(run_select(query))
+
+
+def select_4():
+    query = "SELECT ProductName, UnitPrice FROM Products WHERE UnitPrice > 40;"
+    show_result(run_select(query))
+
+
+
 def select_5():
-    query = "SELECT COUNT(*) FROM Orders;"
+    query = "SELECT OrderID, OrderDate FROM Orders LIMIT 10;"
     show_result(run_select(query))
 
 
@@ -82,4 +82,5 @@ output = tk.Text(window, height=15, width=85)
 output.pack(pady=10)
 
 window.mainloop()
+
 
